@@ -1,0 +1,57 @@
+<gui>
+	<sprites>
+		<sprite name="grids" texture="gui/shop.png"><frame>0 258 96 64</frame></sprite>
+
+		<sprite name="skill-frame" texture="gui/shop.png"><frame>278 20 32 32</frame></sprite>
+		<sprite name="skill-inner-frame" texture="gui/widget.png"><frame>76 182 28 28</frame></sprite>
+
+		<sprite name="icon-lock" texture="gui/icons.png"><frame>0 100 8 9</frame></sprite>
+		<sprite name="icon-check" texture="gui/icons.png"><frame>8 100 8 8</frame></sprite>
+
+		<sprite name="icon-gold" texture="gui/icons.png"><frame>0 11 9 10</frame></sprite>
+
+%include "gui/scalablebutton_big_sprites.inc"
+%include "gui/scrollbar_sprites.inc"
+%include "gui/scalablebutton_sprites.inc"
+%include "gui/scalablebutton_check_sprites.inc"
+
+		<sprite name="check-lockedin-left" texture="gui/widget.png"><frame>128 126 37 26</frame></sprite>
+		<sprite name="check-lockedin-mid" texture="gui/widget.png"><frame>165 126 1 26</frame></sprite>
+		<sprite name="check-lockedin-right" texture="gui/widget.png"><frame>166 126 37 26</frame></sprite>
+
+		<sprite name="save-icon" texture="gui/icons.png"><frame>205 27 11 12</frame></sprite>
+
+		<sprite name="preset-separator" texture="gui/shop.png"><frame>0 322 10 18</frame></sprite>
+	</sprites>
+
+	<doc>
+		<group width="209" inner="true" flow="vbox">
+			<!-- Presets -->
+			<rect id="presets" width="209" height="18" color="#202a26FF" shadow="#0c120fFF" shadowsize="2" flow="hbox">
+				<!-- Separator -->
+				<rect width="3" height="18" spriteset="gui/variable/3pxbar_vert.sval" />
+
+				<!-- Preset list -->
+				<rect id="preset-list" width="203" height="18" flow="hbox" />
+
+				<!-- Separator -->
+				<rect width="3" height="18" spriteset="gui/variable/3pxbar_vert.sval" />
+			</rect>
+
+			<!-- Preset template -->
+			<grouprect id="preset-template" visible="false" inner="true" height="18" flow="hbox">
+				<!-- Separator -->
+				<sprite id="separator" src="preset-separator" visible="false" />
+
+				<!-- Load button -->
+				<scalebutton id="button-load" width="49" height="18" spriteset="scalebutton" font="gui/fonts/arial11.fnt" />
+
+				<!-- Save button -->
+				<scalebutton id="button-save" width="19" height="18" spriteset="scalebutton" tooltip=".fountain.presets.save">
+					<sprite src="save-icon" anchor="0.5 0.5" />
+				</scalebutton>
+			</grouprect>
+
+		</group>
+	</doc>
+</gui>
