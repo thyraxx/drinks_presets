@@ -10,9 +10,9 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wListPresets;
 	Widget@ m_wTemplatePreset;
 
-	CustomDrinksMenuContent(ShopMenu@ shopMenu)
+	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
 	{
-		super(shopMenu);
+		super();
 	}
 
 	void OnShow() override
