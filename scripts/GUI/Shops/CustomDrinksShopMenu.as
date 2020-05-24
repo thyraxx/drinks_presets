@@ -34,6 +34,10 @@ class CustomDrinksMenuContent : ShopMenuContent
 	void ReloadPresets()
 	{
 		print("-----------------");
+
+		for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
+			print(GetLocalPlayerRecord().tavernDrinksBought[i]);
+		}
 		
 		auto gm = cast<Campaign>(g_gameMode);
 		auto town = gm.m_townLocal;
@@ -43,7 +47,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 		m_wListPresets.ClearChildren();
 
 		// TODO: not use fountain length
-		for (uint i = 0; i < town.m_fountainPresets.length(); i++)
+		for (uint i = 0; i < 3; i++)
 		{
 			auto preset = i;
 
