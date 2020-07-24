@@ -2,13 +2,4 @@
   <string name="name">Drinks Presets</string>
   <string name="author">Thyraxx</string>
   <string name="description">You are able to save drink presets.</string>
-
-  <dict name="classmaps">
-    <array name="scripts">
-      <array>
-        <!-- <string>DrinksShopMenuContent</string><string>CustomDrinksShopMenuContent</string> -->
-        <!-- <string>ShopArea</string><string>CustomShopArea</string>    -->
-      </array>
-    </array>
-  </dict>
 </dict>
