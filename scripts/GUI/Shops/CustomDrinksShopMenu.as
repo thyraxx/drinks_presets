@@ -10,7 +10,9 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wListPresets;
 	Widget@ m_wTemplatePreset;
 
-	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
+	array<string> drinks;
+
+	CustomDrinksMenuContent()
 	{
 		super();
 	}
@@ -274,6 +276,10 @@ class CustomDrinksMenuContent : ShopMenuContent
 			PlaySound2D(Resources::GetSoundEvent("event:/ui/swallow_drink"));
 
 			ReloadList();
+		}
+		else if (parse[0] == "save-preset")
+		{
+			print("test save-preset" + parseUInt(parse[1]));
 		}
 		else
 			ShopMenuContent::OnFunc(sender, name);
