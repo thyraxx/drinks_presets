@@ -16,15 +16,15 @@ namespace drinkspresets
 	void TownRecordSave(TownRecord@ record, SValueBuilder &builder)
 	{
 		// Save all available drink presets in town
-		auto customDrinksShopMenu = CustomDrinksMenuContent();
-		auto effects = customDrinksShopMenu.drinks;
+		//auto customDrinksShopMenu = CustomDrinksMenuContent();
+		//auto effects = customDrinksShopMenu.drinks;
 
-		builder.PushDictionary();
-		builder.PushArray("drinks");
-		for (uint i = 0; i < effects.length(); i++)
-			builder.PushString(effects[i]);
-		builder.PopArray();
-		builder.PopDictionary();
+		//builder.PushDictionary("drinkspresets");
+		//builder.PushArray("drinks");
+		//for (uint i = 0; i < effects.length(); i++)
+		//	builder.PushString(effects[i]);
+		//builder.PopArray();
+		//builder.PopDictionary();
 				
 	}
 
@@ -33,15 +33,32 @@ namespace drinkspresets
 	void TownRecordLoad(TownRecord@ record, SValue@ sval)
 	{
 		// Load all available drink presets in town
-		auto customDrinksShopMenu = CustomDrinksMenuContent();
-		auto effects = customDrinksShopMenu.drinks;
+		//auto customDrinksShopMenu = CustomDrinksMenuContent();
+		//auto effects = customDrinksShopMenu.drinks;
+		//print("Town Record Load");
 
-		effects.removeRange(0, effects.length());
-		auto arrEffects = GetParamArray(UnitPtr(), sval, "drinks", false);
-		if (arrEffects !is null)
+
+		//effects.removeRange(0, effects.length());
+		//auto arrEffects = GetParamArray(UnitPtr(), sval, "drinks", false);
+		//if (arrEffects !is null)
+		//{
+		//	for (uint i = 0; i < arrEffects.length(); i++){
+		//		effects.insertLast(arrEffects[i].GetString());
+		//		print("drinks: " + arrEffects[i].GetString());
+		//	}
+
+		//}
+		CustomDrinksMenuContent test;
+		auto arrFountainPresets = GetParamArray(UnitPtr(), sval, "drinks", false);
+		if (arrFountainPresets !is null)
 		{
-			for (uint i = 0; i < arrEffects.length(); i++)
-				effects.insertLast(arrEffects[i].GetInteger());
+			uint num = min(arrFountainPresets.length(), test.m_drinkPresets.length());
+			for (uint i = 0; i < num; i++)
+			{
+				auto newPreset = DrinkPreset();
+				newPreset.Load(arrFountainPresets[i]);
+				test.m_drinkPresets[i] = newPreset;
+			}
 		}
 	}
 

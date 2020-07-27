@@ -1,5 +1,33 @@
+class DrinkPreset
+{
+	array<string> drinks;
+
+	void Save(SValueBuilder@ builder)
+	{
+		builder.PushDictionary();
+		builder.PushArray("drinks");
+		for (uint i = 0; i < drinks.length(); i++)
+			builder.PushString(drinks[i]);
+		builder.PopArray();
+		builder.PopDictionary();
+	}
+
+	void Load(SValue@ data)
+	{
+		drinks.removeRange(0, drinks.length());
+		auto arrEffects = GetParamArray(UnitPtr(), data, "drinks", false);
+		if (arrEffects !is null)
+		{
+			for (uint i = 0; i < arrEffects.length(); i++)
+				drinks.insertLast(arrEffects[i].GetString());
+		}
+	}
+}
+
 class CustomDrinksMenuContent : ShopMenuContent
 {
+	array<DrinkPreset@> m_drinkPresets;
+
 	TextWidget@ m_wHeaderText;
 
 	ScrollableWidget@ m_wList;
@@ -10,9 +38,12 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wListPresets;
 	Widget@ m_wTemplatePreset;
 
-	array<string> drinks;
-
 	CustomDrinksMenuContent()
+	{
+		super();
+	}
+
+	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
 	{
 		super();
 	}
@@ -279,7 +310,25 @@ class CustomDrinksMenuContent : ShopMenuContent
 		}
 		else if (parse[0] == "save-preset")
 		{
-			print("test save-preset" + parseUInt(parse[1]));
+			uint saveSlot = parseUInt(parse[1]);
+
+			print("Saved in slot " + saveSlot);
+
+			SValueBuilder builder;
+
+			builder.PushArray("drinks");
+			for (uint i = 0; i < m_drinkPresets.length(); i++)
+				m_drinkPresets[i].Save(builder);
+			builder.PopArray();
+
+			//for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
+			//	
+			//	drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
+			//	print(GetLocalPlayerRecord().tavernDrinksBought[i]);
+			//}
+
+
+
 		}
 		else
 			ShopMenuContent::OnFunc(sender, name);
