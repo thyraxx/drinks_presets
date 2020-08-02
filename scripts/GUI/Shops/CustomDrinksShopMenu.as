@@ -6,8 +6,9 @@ class DrinkPreset
 	{
 		builder.PushDictionary();
 		builder.PushArray("drinks");
-		for (uint i = 0; i < drinks.length(); i++)
+		for (uint i = 0; i < drinks.length(); i++){
 			builder.PushString(drinks[i]);
+		}
 		builder.PopArray();
 		builder.PopDictionary();
 	}
@@ -18,8 +19,10 @@ class DrinkPreset
 		auto arrEffects = GetParamArray(UnitPtr(), data, "drinks", false);
 		if (arrEffects !is null)
 		{
-			for (uint i = 0; i < arrEffects.length(); i++)
+			for (uint i = 0; i < arrEffects.length(); i++){
+				print(arrEffects[i].GetString());
 				drinks.insertLast(arrEffects[i].GetString());
+			}
 		}
 	}
 }
@@ -39,12 +42,15 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wTemplatePreset;
 
 	CustomDrinksMenuContent()
-	{
+	{	
 		super();
 	}
 
 	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
 	{
+		for (int i = 0; i < 3; i++)
+			m_drinkPresets.insertLast(DrinkPreset());
+
 		super();
 	}
 
@@ -67,9 +73,11 @@ class CustomDrinksMenuContent : ShopMenuContent
 	void ReloadPresets()
 	{
 		print("-----------------");
+		
 
 		for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
-			print(GetLocalPlayerRecord().tavernDrinksBought[i]);
+			m_drinkPresets[0].drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
+			//print(GetLocalPlayerRecord().tavernDrinksBought[i]);
 		}
 		
 		auto gm = cast<Campaign>(g_gameMode);
@@ -102,11 +110,11 @@ class CustomDrinksMenuContent : ShopMenuContent
 				wButtonLoad.SetText(strName);
 				wButtonLoad.m_tooltipTitle = strName;
 
-				// string strTooltip;
-				// bool secondEffect = false;
-				// for (uint j = 0; j < preset.effects.length(); j++)
-				// {
-				// 	auto effect = Fountain::GetEffect(preset.effects[j]);
+				string strTooltip;
+				bool secondEffect = false;
+				for (uint j = 0; j < m_drinkPresets[i].drinks.length(); j++)
+				{
+				//	auto effect = Fountain::GetEffect(preset.effects[j]);
 				// 	if (effect is null)
 				// 		continue;
 
@@ -118,9 +126,10 @@ class CustomDrinksMenuContent : ShopMenuContent
 				// 		strTooltip += "\\c00ff00";
 				// 	else if (effect.m_favor < 0)
 				// 		strTooltip += "\\cff0000";
-				// 	strTooltip += Resources::GetString(".fountain.effect." + effect.m_id + ".name");
-				// }
-				// wButtonLoad.m_tooltipText = strTooltip;
+				 	strTooltip += Resources::GetString(".drink." + m_drinkPresets[i].drinks[j] + ".name");
+				 	strTooltip += "\n";
+				}
+				wButtonLoad.m_tooltipText = strTooltip;
 			}
 
 			auto wButtonSave = cast<ScalableSpriteButtonWidget>(wNewItem.GetWidgetById("button-save"));
@@ -316,19 +325,24 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 			SValueBuilder builder;
 
-			builder.PushArray("drinks");
-			for (uint i = 0; i < m_drinkPresets.length(); i++)
-				m_drinkPresets[i].Save(builder);
-			builder.PopArray();
+			for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
+				
+				m_drinkPresets[saveSlot].drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
+				print(GetLocalPlayerRecord().tavernDrinksBought[i]);
+			}
 
-			//for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
-			//	
-			//	drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
-			//	print(GetLocalPlayerRecord().tavernDrinksBought[i]);
-			//}
+			m_drinkPresets[saveSlot].Save(builder);
 
 
+		}
+		else if(parse[0] == "load-preset")
+		{
+			uint loadSlot = parseUInt(parse[1]);
+			print("Load in slot " + loadSlot);
 
+			for(uint i = 0; i < m_drinkPresets[loadSlot].drinks.length(); i++){
+				print(m_drinkPresets[loadSlot].drinks[i]);
+			}
 		}
 		else
 			ShopMenuContent::OnFunc(sender, name);
