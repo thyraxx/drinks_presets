@@ -42,13 +42,13 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wTemplatePreset;
 
 	CustomDrinksMenuContent()
-	{	
+	{
 		super();
 	}
 
 	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
 	{
-		for (int i = 0; i < 3; i++)
+		for(int i = 0; i < 3; i++)
 			m_drinkPresets.insertLast(DrinkPreset());
 
 		super();
@@ -73,13 +73,15 @@ class CustomDrinksMenuContent : ShopMenuContent
 	void ReloadPresets()
 	{
 		print("-----------------");
-		
 
-		for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
-			m_drinkPresets[0].drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
-			//print(GetLocalPlayerRecord().tavernDrinksBought[i]);
+		for(uint k = 0; k < 3; k++){
+			auto drinkList = m_drinkPresets[k].drinks;
+
+			for(uint i = 0; i < drinkList.length(); i++){
+				print(drinkList[i]);
+			}
 		}
-		
+
 		auto gm = cast<Campaign>(g_gameMode);
 		auto town = gm.m_townLocal;
 
@@ -97,7 +99,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 			wNewItem.m_visible = true;
 
 			auto wButtonLoad = cast<ScalableSpriteButtonWidget>(wNewItem.GetWidgetById("button-load"));
-			print("Enabled: " + wButtonLoad.m_enabled);
+			//print("Enabled: " + wButtonLoad.m_enabled);
 			if (wButtonLoad !is null)
 			{
 				// TODO: Check thoroughly
@@ -321,19 +323,22 @@ class CustomDrinksMenuContent : ShopMenuContent
 		{
 			uint saveSlot = parseUInt(parse[1]);
 
+			auto drinkPreset = DrinkPreset();
+
 			print("Saved in slot " + saveSlot);
+
 
 			SValueBuilder builder;
 
 			for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
 				
-				m_drinkPresets[saveSlot].drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
+				drinkPreset.drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
 				print(GetLocalPlayerRecord().tavernDrinksBought[i]);
 			}
 
-			m_drinkPresets[saveSlot].Save(builder);
+			m_drinkPresets[saveSlot] = drinkPreset;
 
-
+			ReloadPresets();
 		}
 		else if(parse[0] == "load-preset")
 		{

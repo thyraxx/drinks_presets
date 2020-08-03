@@ -15,14 +15,35 @@ namespace drinkspresets
 	[Hook]
 	void TownRecordSave(TownRecord@ record, SValueBuilder &builder)
 	{
-				
+		CustomDrinksMenuContent test;
+		
+		builder.PushArray("drink-presets");
+		for (uint i = 0; i < test.m_drinkPresets.length(); i++)
+			test.m_drinkPresets[i].Save(builder);
+		builder.PopArray();
 	}
 
 
 	[Hook]
 	void TownRecordLoad(TownRecord@ record, SValue@ sval)
 	{
+		CustomDrinksMenuContent test;
+		auto drinkPresets = test.m_drinkPresets;
 
+		//for (uint i = 0; i < drinkPresets.length(); i++)
+		//	@drinkPresets[i] = DrinkPreset();
+
+		auto arrFountainPresets = GetParamArray(UnitPtr(), sval, "drink-presets", false);
+		if (arrFountainPresets !is null)
+		{
+			uint num = min(arrFountainPresets.length(), drinkPresets.length());
+			for (uint i = 0; i < num; i++)
+			{
+				auto newPreset = DrinkPreset();
+				newPreset.Load(arrFountainPresets[i]);
+				@drinkPresets[i] = newPreset;
+			}
+		}
 	}
 
 }
