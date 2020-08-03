@@ -48,8 +48,8 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 	CustomDrinksMenuContent(UnitPtr unit, SValue& params)
 	{
-		for(int i = 0; i < 3; i++)
-			m_drinkPresets.insertLast(DrinkPreset());
+		//for(int i = 0; i < 3; i++)
+			//m_drinkPresets.insertLast(DrinkPreset());
 
 		super();
 	}
@@ -72,16 +72,6 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 	void ReloadPresets()
 	{
-		print("-----------------");
-
-		for(uint k = 0; k < 3; k++){
-			auto drinkList = m_drinkPresets[k].drinks;
-
-			for(uint i = 0; i < drinkList.length(); i++){
-				print(drinkList[i]);
-			}
-		}
-
 		auto gm = cast<Campaign>(g_gameMode);
 		auto town = gm.m_townLocal;
 
@@ -99,13 +89,29 @@ class CustomDrinksMenuContent : ShopMenuContent
 			wNewItem.m_visible = true;
 
 			auto wButtonLoad = cast<ScalableSpriteButtonWidget>(wNewItem.GetWidgetById("button-load"));
-			//print("Enabled: " + wButtonLoad.m_enabled);
 			if (wButtonLoad !is null)
 			{
-				// TODO: Check thoroughly
-				//wButtonLoad.m_enabled = (!isLockedIn && Network::IsServer() && preset.effects.length() > 0);
+				int price = 0;
+				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++){
+					
+					// Check if player has enough money or still have drinks left
+					string drinkName = Drinkspresets::m_drinkPresets[i].drinks[k];
+					for(uint i = 0; i < g_tavernDrinks.length(); i++){
+						if(g_tavernDrinks[i].name == ".drink." + drinkName + ".name"){
+							if(g_tavernDrinks[i].localCount <= 0)
+							{
+								price = price + g_tavernDrinks[i].cost;
+							}
+							break;
+						}
+					}					
+				}
 
-				wButtonLoad.m_enabled = true;
+				print("Total price: " + price);
+
+				wButtonLoad.m_enabled = (town.m_gold >= price);
+
+				//wButtonLoad.m_enabled = true;
 				wButtonLoad.m_func = "load-preset " + i;
 
 				string strName = Resources::GetString(".fountain.presets.name", { { "num", i + 1 } });
@@ -114,7 +120,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 				string strTooltip;
 				bool secondEffect = false;
-				for (uint j = 0; j < m_drinkPresets[i].drinks.length(); j++)
+				for (uint j = 0; j < Drinkspresets::m_drinkPresets[i].drinks.length(); j++)
 				{
 				//	auto effect = Fountain::GetEffect(preset.effects[j]);
 				// 	if (effect is null)
@@ -128,7 +134,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 				// 		strTooltip += "\\c00ff00";
 				// 	else if (effect.m_favor < 0)
 				// 		strTooltip += "\\cff0000";
-				 	strTooltip += Resources::GetString(".drink." + m_drinkPresets[i].drinks[j] + ".name");
+				 	strTooltip += Resources::GetString(".drink." + Drinkspresets::m_drinkPresets[i].drinks[j] + ".name");
 				 	strTooltip += "\n";
 				}
 				wButtonLoad.m_tooltipText = strTooltip;
@@ -322,31 +328,43 @@ class CustomDrinksMenuContent : ShopMenuContent
 		else if (parse[0] == "save-preset")
 		{
 			uint saveSlot = parseUInt(parse[1]);
-
-			auto drinkPreset = DrinkPreset();
-
 			print("Saved in slot " + saveSlot);
 
+			auto drinkPreset = DrinkPreset();
 
 			SValueBuilder builder;
 
 			for(uint i = 0; i < GetLocalPlayerRecord().tavernDrinksBought.length(); i++){
-				
 				drinkPreset.drinks.insertLast(GetLocalPlayerRecord().tavernDrinksBought[i]);
-				print(GetLocalPlayerRecord().tavernDrinksBought[i]);
 			}
 
-			m_drinkPresets[saveSlot] = drinkPreset;
+			Drinkspresets::m_drinkPresets[saveSlot] = drinkPreset;
 
 			ReloadPresets();
 		}
 		else if(parse[0] == "load-preset")
 		{
+			auto player = GetLocalPlayer();
 			uint loadSlot = parseUInt(parse[1]);
-			print("Load in slot " + loadSlot);
 
-			for(uint i = 0; i < m_drinkPresets[loadSlot].drinks.length(); i++){
-				print(m_drinkPresets[loadSlot].drinks[i]);
+			for(uint i = 0; i < Drinkspresets::m_drinkPresets[loadSlot].drinks.length(); i++){
+				//Drinkspresets::m_drinkPresets[loadSlot].drinks[i];
+				
+				for(uint k = 0; k < g_tavernDrinks.length(); k++)
+				{
+					string drinkName = Drinkspresets::m_drinkPresets[loadSlot].drinks[i];
+					if(g_tavernDrinks[i].name == ".drink." + drinkName + ".name")
+					{
+						player.AddDrink(g_tavernDrinks[i]);
+						player.m_record.tavernDrinksBought.insertLast(g_tavernDrinks[i].id);
+						player.RefreshModifiers();
+
+						print("Added " + g_tavernDrinks[i].name + " to player.");
+					}
+					break;
+				}
+				
+				
 			}
 		}
 		else

@@ -1,6 +1,8 @@
-namespace drinkspresets 
+namespace Drinkspresets 
 {
-	
+
+	array<DrinkPreset@> m_drinkPresets;
+
 	[Hook]
 	void WidgetHosterResourceAdded(Widget@ parent, Widget@ w, GUIBuilder@ b, GUIDef@ def){
 		// This is just an experiment to modify the gui without actually overwriting the gui file
@@ -13,13 +15,19 @@ namespace drinkspresets
 	}
 
 	[Hook]
+	void GameModeConstructor(Campaign@ campaign)
+	{
+		for(int i = 0; i < 3; i++)
+			m_drinkPresets.insertLast(DrinkPreset());
+	}
+
+	[Hook]
 	void TownRecordSave(TownRecord@ record, SValueBuilder &builder)
 	{
-		CustomDrinksMenuContent test;
-		
 		builder.PushArray("drink-presets");
-		for (uint i = 0; i < test.m_drinkPresets.length(); i++)
-			test.m_drinkPresets[i].Save(builder);
+		for (uint i = 0; i < m_drinkPresets.length(); i++){
+			m_drinkPresets[i].Save(builder);
+		}
 		builder.PopArray();
 	}
 
@@ -28,22 +36,17 @@ namespace drinkspresets
 	void TownRecordLoad(TownRecord@ record, SValue@ sval)
 	{
 		CustomDrinksMenuContent test;
-		auto drinkPresets = test.m_drinkPresets;
-
-		//for (uint i = 0; i < drinkPresets.length(); i++)
-		//	@drinkPresets[i] = DrinkPreset();
 
 		auto arrFountainPresets = GetParamArray(UnitPtr(), sval, "drink-presets", false);
 		if (arrFountainPresets !is null)
 		{
-			uint num = min(arrFountainPresets.length(), drinkPresets.length());
+			uint num = min(arrFountainPresets.length(), m_drinkPresets.length());
 			for (uint i = 0; i < num; i++)
 			{
 				auto newPreset = DrinkPreset();
 				newPreset.Load(arrFountainPresets[i]);
-				@drinkPresets[i] = newPreset;
+				m_drinkPresets[i] = newPreset;
 			}
 		}
 	}
-
 }
