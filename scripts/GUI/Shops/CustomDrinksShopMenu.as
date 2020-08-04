@@ -107,10 +107,6 @@ class CustomDrinksMenuContent : ShopMenuContent
 					// Debugging total price cost
 					//print("Total price: " + price);
 
-					
-					//for (uint j = 0; j < Drinkspresets::m_drinkPresets[i].drinks.length(); j++)
-					//{
-
 					// TODO: Maybe add color rarity to the text of the drinks?
 					//	auto effect = Fountain::GetEffect(preset.effects[j]);
 					// 	if (effect is null)
@@ -124,7 +120,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 					// 		strTooltip += "\\c00ff00";
 					// 	else if (effect.m_favor < 0)
 					// 		strTooltip += "\\cff0000";
-				
+
 				 	strTooltip += Resources::GetString(".drink." + drink.id + ".name");
 				 	strTooltip += "\n";
 				}
