@@ -41,6 +41,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wListPresets;
 	Widget@ m_wTemplatePreset;
 
+	// Argh, ugly fix but the easiest/fastest I could come up with
 	CustomDrinksMenuContent()
 	{
 		super();
@@ -72,11 +73,8 @@ class CustomDrinksMenuContent : ShopMenuContent
 		auto gm = cast<Campaign>(g_gameMode);
 		auto town = gm.m_townLocal;
 
-		//bool isLockedIn = (Fountain::CurrentEffects.length() > 0);
-
 		m_wListPresets.ClearChildren();
 
-		// TODO: not use fountain length
 		for (uint i = 0; i < 3; i++)
 		{
 			auto preset = i;
@@ -89,27 +87,6 @@ class CustomDrinksMenuContent : ShopMenuContent
 			if (wButtonLoad !is null)
 			{
 				int price = 0;
-				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++){
-					
-					// Check if player has enough money or still have drinks left
-					string drinkName = Drinkspresets::m_drinkPresets[i].drinks[k];
-					for(uint i = 0; i < g_tavernDrinks.length(); i++){
-						if(g_tavernDrinks[i].name == ".drink." + drinkName + ".name"){
-							if(g_tavernDrinks[i].localCount <= 0)
-							{
-								price = price + g_tavernDrinks[i].cost;
-							}
-							break;
-						}
-					}					
-				}
-
-				print("Total price: " + price);
-
-				wButtonLoad.m_enabled = (town.m_gold >= price && (GetLocalPlayerRecord().tavernDrinksBought.length() <= 0));
-
-				//wButtonLoad.m_enabled = true;
-				wButtonLoad.m_func = "load-preset " + i;
 
 				string strName = Resources::GetString(".fountain.presets.name", { { "num", i + 1 } });
 				wButtonLoad.SetText(strName);
@@ -117,23 +94,43 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 				string strTooltip;
 				bool secondEffect = false;
-				for (uint j = 0; j < Drinkspresets::m_drinkPresets[i].drinks.length(); j++)
+
+				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++)
 				{
-				//	auto effect = Fountain::GetEffect(preset.effects[j]);
-				// 	if (effect is null)
-				// 		continue;
+					auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[i].drinks[k]));
+					
+					if(drink.localCount <= 0)
+					{
+						price = price + drink.cost;
+					}
 
-				// 	if (secondEffect)
-				// 		strTooltip += "\\d, ";
-				// 	secondEffect = true;
+					// Debugging total price cost
+					//print("Total price: " + price);
 
-				// 	if (effect.m_favor > 0)
-				// 		strTooltip += "\\c00ff00";
-				// 	else if (effect.m_favor < 0)
-				// 		strTooltip += "\\cff0000";
-				 	strTooltip += Resources::GetString(".drink." + Drinkspresets::m_drinkPresets[i].drinks[j] + ".name");
+					
+					//for (uint j = 0; j < Drinkspresets::m_drinkPresets[i].drinks.length(); j++)
+					//{
+
+					// TODO: Maybe add color rarity to the text of the drinks?
+					//	auto effect = Fountain::GetEffect(preset.effects[j]);
+					// 	if (effect is null)
+					// 		continue;
+
+					// 	if (secondEffect)
+					// 		strTooltip += "\\d, ";
+					// 	secondEffect = true;
+
+					// 	if (effect.m_favor > 0)
+					// 		strTooltip += "\\c00ff00";
+					// 	else if (effect.m_favor < 0)
+					// 		strTooltip += "\\cff0000";
+				
+				 	strTooltip += Resources::GetString(".drink." + drink.id + ".name");
 				 	strTooltip += "\n";
 				}
+				wButtonLoad.m_enabled = (town.m_gold >= price && (GetLocalPlayerRecord().tavernDrinksBought.length() <= 0));
+				wButtonLoad.m_func = "load-preset " + i;
+
 				wButtonLoad.m_tooltipText = strTooltip;
 			}
 
@@ -141,6 +138,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 			if (wButtonSave !is null)
 				wButtonSave.m_func = "save-preset " + i;
 
+			// TODO: Check if can be removed, maybe can be used in the future?
 			// auto wSeparator = wNewItem.GetWidgetById("separator");
 			// if (wSeparator !is null)
 			// 	wSeparator.m_visible = (i > 0);
@@ -321,6 +319,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 			PlaySound2D(Resources::GetSoundEvent("event:/ui/swallow_drink"));
 
 			ReloadList();
+			ReloadPresets();
 		}
 		else if (parse[0] == "save-preset")
 		{
@@ -336,33 +335,30 @@ class CustomDrinksMenuContent : ShopMenuContent
 			}
 
 			Drinkspresets::m_drinkPresets[saveSlot] = drinkPreset;
-
 			ReloadPresets();
 		}
 		else if(parse[0] == "load-preset")
 		{
+			auto gm = cast<Campaign>(g_gameMode);
+			auto town = gm.m_townLocal;
+
 			auto player = GetLocalPlayer();
 			uint loadSlot = parseUInt(parse[1]);
 
+			// TODO: Maybe call the on-func instead?
 			for(uint i = 0; i < Drinkspresets::m_drinkPresets[loadSlot].drinks.length(); i++){
-				//Drinkspresets::m_drinkPresets[loadSlot].drinks[i];
-				print("drinks");
-				
-				for(uint k = 0; k < g_tavernDrinks.length(); k++)
-				{
-					string drinkName = Drinkspresets::m_drinkPresets[loadSlot].drinks[i];
-					if(g_tavernDrinks[k].name == ".drink." + drinkName + ".name")
-					{
-						player.AddDrink(g_tavernDrinks[k]);
-						player.m_record.tavernDrinksBought.insertLast(g_tavernDrinks[k].id);
-						player.RefreshModifiers();
 
-						print("Added " + g_tavernDrinks[k].name + " to player.");
-						break;
-					}
-				}
+				auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[loadSlot].drinks[i]));
+					
+				gm.m_townLocal.m_gold -= drink.cost;
+				player.AddDrink(drink);
+				player.m_record.tavernDrinksBought.insertLast(drink.id);
+
+				// Debugging which drink is actually added to the player
+				//print("Added " + drink.name + " to player.");
 			}
-			
+
+			player.RefreshModifiers();
 			ReloadList();
 			ReloadPresets();
 		}
