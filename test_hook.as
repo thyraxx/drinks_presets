@@ -3,16 +3,17 @@ namespace Drinkspresets
 
 	array<DrinkPreset@> m_drinkPresets;
 
-	[Hook]
-	void WidgetHosterResourceAdded(Widget@ parent, Widget@ w, GUIBuilder@ b, GUIDef@ def){
+	// I leave it here, maybe for experimenting in the future
+	//[Hook]
+	//void WidgetHosterResourceAdded(Widget@ parent, Widget@ w, GUIBuilder@ b, GUIDef@ def){
 		// This is just an experiment to modify the gui without actually overwriting the gui file
-		print("Parent: " + parent.m_id + " w: " + w.m_id + " GUIDef: " + def.GetPath());
+	//	print("Parent: " + parent.m_id + " w: " + w.m_id + " GUIDef: " + def.GetPath());
 		
-		if(def.GetPath() == "gui/shop/drinks.gui"){
-			print("----------");
+	//	if(def.GetPath() == "gui/shop/drinks.gui"){
+	//		print("----------");
 			//parent.AddResource(b, "gui/town/ledger/info.gui");
-		}
-	}
+	//	}
+	//}
 
 	[Hook]
 	void GameModeConstructor(Campaign@ campaign)
