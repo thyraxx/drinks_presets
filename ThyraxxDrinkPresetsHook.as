@@ -36,8 +36,6 @@ namespace Drinkspresets
 	[Hook]
 	void TownRecordLoad(TownRecord@ record, SValue@ sval)
 	{
-		CustomDrinksMenuContent test;
-
 		auto arrFountainPresets = GetParamArray(UnitPtr(), sval, "drink-presets", false);
 		if (arrFountainPresets !is null)
 		{
