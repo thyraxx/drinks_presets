@@ -97,8 +97,10 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++)
 				{
+
 					auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[i].drinks[k]));
-					
+					ActorItemQuality drinkQuality = drink.quality;
+
 					if(drink.localCount <= 0)
 					{
 						price = price + drink.cost;
@@ -107,19 +109,15 @@ class CustomDrinksMenuContent : ShopMenuContent
 					// Debugging total price cost
 					//print("Total price: " + price);
 
-					// TODO: Maybe add color rarity to the text of the drinks?
-					//	auto effect = Fountain::GetEffect(preset.effects[j]);
-					// 	if (effect is null)
-					// 		continue;
+					// Adds color rarity to the text
+					if (drinkQuality == 1)
+						strTooltip += "\\cffffff";
 
-					// 	if (secondEffect)
-					// 		strTooltip += "\\d, ";
-					// 	secondEffect = true;
+					if (drinkQuality == 2)
+						strTooltip += "\\c00ff00";
 
-					// 	if (effect.m_favor > 0)
-					// 		strTooltip += "\\c00ff00";
-					// 	else if (effect.m_favor < 0)
-					// 		strTooltip += "\\cff0000";
+					if (drinkQuality == 3)
+						strTooltip += "\\c0099ff";
 
 				 	strTooltip += Resources::GetString(".drink." + drink.id + ".name");
 				 	strTooltip += "\n";
@@ -133,11 +131,6 @@ class CustomDrinksMenuContent : ShopMenuContent
 			auto wButtonSave = cast<ScalableSpriteButtonWidget>(wNewItem.GetWidgetById("button-save"));
 			if (wButtonSave !is null)
 				wButtonSave.m_func = "save-preset " + i;
-
-			// TODO: Check if can be removed, maybe can be used in the future?
-			// auto wSeparator = wNewItem.GetWidgetById("separator");
-			// if (wSeparator !is null)
-			// 	wSeparator.m_visible = (i > 0);
 
 			m_wListPresets.AddChild(wNewItem);
 		}
