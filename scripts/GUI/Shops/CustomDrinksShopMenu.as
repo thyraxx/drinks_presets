@@ -20,7 +20,7 @@ class DrinkPreset
 		if (arrEffects !is null)
 		{
 			for (uint i = 0; i < arrEffects.length(); i++){
-				print(arrEffects[i].GetString());
+				//print(arrEffects[i].GetString());
 				drinks.insertLast(arrEffects[i].GetString());
 			}
 		}
