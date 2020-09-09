@@ -182,6 +182,7 @@
 			<bool>f</bool>
 			<string>stage2</string>
 			<dict>
+				<string name="Category">CustomDrinksMenuContent</string>
 				<int name="ShopLevel">2</int>
 				<array name="Areas"><int>1</int></array>
 				<int name="Type">11</int>
