@@ -41,6 +41,13 @@ class CustomDrinksMenuContent : ShopMenuContent
 	Widget@ m_wListPresets;
 	Widget@ m_wTemplatePreset;
 
+	array<string> cantAfford = {
+		"Can't afford.",
+		"Git rich.",
+		"Peasant",
+		"Too poor."
+	};
+
 	// Argh, ugly fix but the easiest/fastest I could come up with
 	CustomDrinksMenuContent()
 	{
@@ -87,6 +94,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 			if (wButtonLoad !is null)
 			{
 				int price = 0;
+				bool canBuy;
 
 				string strName = Resources::GetString(".fountain.presets.name", { { "num", i + 1 } });
 				wButtonLoad.SetText(strName);
@@ -99,30 +107,64 @@ class CustomDrinksMenuContent : ShopMenuContent
 				{
 
 					auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[i].drinks[k]));
-					ActorItemQuality drinkQuality = drink.quality;
+
 
 					if(drink.localCount <= 0)
 					{
 						price = price + drink.cost;
 					}
 
+					canBuy = (town.m_gold >= price && (GetLocalPlayerRecord().tavernDrinksBought.length() <= 0));
+				}
+
+				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++)
+				{
+
+					auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[i].drinks[k]));
+					ActorItemQuality drinkQuality = drink.quality;
+
 					// Debugging total price cost
 					//print("Total price: " + price);
 
 					// Adds color rarity to the text
-					if (drinkQuality == 1)
-						strTooltip += "\\cffffff";
+				
+					if(canBuy)
+					{
+						if (drinkQuality == 1)
+							strTooltip += "\\cffffff";
 
-					if (drinkQuality == 2)
-						strTooltip += "\\c00ff00";
+						if (drinkQuality == 2)
+							strTooltip += "\\c00ff00";
 
-					if (drinkQuality == 3)
-						strTooltip += "\\c0099ff";
+						if (drinkQuality == 3)
+							strTooltip += "\\c0099ff";
+					}
+					else
+					{
+						strTooltip += "\\c737372";
+					}
 
 				 	strTooltip += Resources::GetString(".drink." + drink.id + ".name");
 				 	strTooltip += "\n";
 				}
-				wButtonLoad.m_enabled = (town.m_gold >= price && (GetLocalPlayerRecord().tavernDrinksBought.length() <= 0));
+
+				// Ugly code color mess :(
+				if(!canBuy)
+				{
+					strTooltip += "\n";
+					strTooltip += "\\cff0000";
+					
+					if(price > town.m_gold)
+					{
+						strTooltip += cantAfford[randi(cantAfford.length())];
+					}
+					else if(GetLocalPlayerRecord().tavernDrinksBought.length() > 0)
+					{
+						strTooltip += "No mixing!";
+					}
+				}
+
+				wButtonLoad.m_enabled = canBuy;
 				wButtonLoad.m_func = "load-preset " + i;
 
 				wButtonLoad.m_tooltipText = strTooltip;
@@ -269,6 +311,7 @@ class CustomDrinksMenuContent : ShopMenuContent
 
 	void OnFunc(Widget@ sender, string name) override
 	{
+
 		auto parse = name.split(" ");
 		if (parse[0] == "buy-drink")
 		{
@@ -334,14 +377,8 @@ class CustomDrinksMenuContent : ShopMenuContent
 			auto player = GetLocalPlayer();
 			uint loadSlot = parseUInt(parse[1]);
 
-			// TODO: Maybe call the on-func instead?
 			for(uint i = 0; i < Drinkspresets::m_drinkPresets[loadSlot].drinks.length(); i++){
-
-				auto drink = GetTavernDrink(HashString(Drinkspresets::m_drinkPresets[loadSlot].drinks[i]));
-					
-				gm.m_townLocal.m_gold -= drink.cost;
-				player.AddDrink(drink);
-				player.m_record.tavernDrinksBought.insertLast(drink.id);
+				OnFunc(sender, "buy-drink " + HashString(Drinkspresets::m_drinkPresets[loadSlot].drinks[i]));
 
 				// Debugging which drink is actually added to the player
 				//print("Added " + drink.name + " to player.");
