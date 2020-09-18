@@ -154,13 +154,13 @@ class CustomDrinksMenuContent : ShopMenuContent
 					strTooltip += "\n";
 					strTooltip += "\\cff0000";
 					
-					if(price > town.m_gold)
-					{
-						strTooltip += cantAfford[randi(cantAfford.length())];
-					}
-					else if(GetLocalPlayerRecord().tavernDrinksBought.length() > 0)
+					if(GetLocalPlayerRecord().tavernDrinksBought.length() > 0)
 					{
 						strTooltip += "No mixing!";
+					}
+					else if(price > town.m_gold)
+					{
+						strTooltip += cantAfford[randi(cantAfford.length())];
 					}
 				}
 
