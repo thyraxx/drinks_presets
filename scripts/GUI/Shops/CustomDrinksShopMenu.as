@@ -114,7 +114,8 @@ class CustomDrinksMenuContent : ShopMenuContent
 						price = price + drink.cost;
 					}
 
-					canBuy = (town.m_gold >= price && (GetLocalPlayerRecord().tavernDrinksBought.length() <= 0));
+					auto localPlayerRecord = GetLocalPlayerRecord();
+					canBuy = (Currency::CanAfford(localPlayerRecord, price) && (localPlayerRecord.tavernDrinksBought.length() <= 0));
 				}
 
 				for(uint k = 0; k < Drinkspresets::m_drinkPresets[i].drinks.length(); k++)
